@@ -4,16 +4,19 @@ const elAddBtn = document.querySelector('.js-addBtn');
 const elList = document.querySelector('.js-list');
 
 const btnBox = document.querySelector('.js-btnbox');
-const allBtn = document.querySelector('.js-allbtn');
 const allBtnText = document.querySelector('.js-allbtntext');
-const compleatedBtn = document.querySelector('.js-completed');
 const compleatedText = document.querySelector('.compleatedtext');
-const uncompleatedBtn = document.querySelector('.js-uncompleated');
 const uncompleatedText = document.querySelector('.uncompleatedtext');
 
-const todos = [];
+const localData = JSON.parse(window.localStorage.getItem('todos'))
+const todos = localData ? localData : [];
+
 function render(array, node) {
+  window.localStorage.setItem('todos', JSON.stringify(todos));
   node.innerHTML = ''
+  allBtnText.textContent = `(${todos.length})`;
+  compleatedText.textContent = `(${todos.filter((item) => item.isCompleated).length})`
+  uncompleatedText.textContent = `(${todos.filter((item) => item.isCompleated == false).length})`
   array.forEach((item) => {
     let newItem = document.createElement('li');
     newItem.classList.add('list-group-item', 'd-flex', 'align-items-center');
@@ -52,6 +55,8 @@ function render(array, node) {
   })
 };
 
+render(todos, elList)
+
 
 
 
@@ -62,14 +67,13 @@ function render(array, node) {
 elForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
   let obj = {
-    id: todos.length + 1,
+    id: todos.length ? todos[todos.length - 1].id + 1 : 1,
     text: elInput.value,
     isCompleated: false,
   };
   todos.push(obj);
-  allBtnText.textContent = `(${todos.length})`;
-  uncompleatedText.textContent = `(${todos.length})`;
   elInput.value = '';
+
   render(todos, elList);
 
 });
@@ -97,18 +101,18 @@ btnBox.addEventListener('click', (evt) => {
   if (evt.target.matches('.js-allbtn')) {
     render(todos, elList);
   }
+  if (evt.target.matches('.js-clearbtn')) {
+    window.localStorage.removeItem('todos');
+    render(todos, elList)
+  }
 
 })
 
 let comText = 0
-// let comTextMinus = 0
-// delete edit and cehck==========================
 elList.addEventListener('click', (evt) => {
   if (evt.target.matches('.js-delbtn')) {
     const x = evt.target.dataset.todoId;
     const findedIndex = todos.findIndex((item) => item.id == x);
-    allBtnText.textContent = `(${todos.length - 1})`
-    // uncompleatedText.textContent = `(${todos.length})`
     todos.splice(findedIndex, 1)
     render(todos, elList)
   }
@@ -128,16 +132,35 @@ elList.addEventListener('click', (evt) => {
       return item.isCompleated == true;
     })
 
-    compleatedText.textContent = 
-    `(${filteredTodo.length})`;
-    uncompleatedText.textContent = 
-    `(${todos.length - filteredTodo.length})`;
     render(todos, elList);
 
-    
+
   }
-  
+
 })
+
+// =====darkmode======================
+const modeBtn = document.querySelector('.js-modebtn')
+let theme = false;
+
+modeBtn.addEventListener('click', function(){
+  theme = !theme;
+  let bg = theme ? 'dark' : 'light';
+  window.localStorage.setItem('theme', bg);
+  changeMode()
+})
+
+function changeMode(){
+  if(window.localStorage.getItem('theme') == 'dark'){
+    document.body.classList.add('dark');
+  }
+  else{
+    document.body.classList.remove('dark');
+
+  }
+}
+changeMode()
+
 // ======================================================
 
 // splice========================
