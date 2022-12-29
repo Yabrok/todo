@@ -103,10 +103,9 @@ btnBox.addEventListener('click', (evt) => {
   }
   if (evt.target.matches('.js-clearbtn')) {
     window.localStorage.removeItem('todos');
-    render(todos, elList)
+    render(todos, elList);
   }
-
-})
+});
 
 let comText = 0
 elList.addEventListener('click', (evt) => {
